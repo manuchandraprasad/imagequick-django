@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block container %}
+{% load url from future %}
+<script type="text/javascript">
+
+$(document).ready(function(){
+	
+
+	$(".play-button").click(function()
+			{	//console.log('Play click');
+				var old=$(this).html();
+				var row = $(this).closest('tr');
+				var statVoice = row.find('.statVoice').val();
+				var freVoice = row.find('.freVoice').val();
+				var posVoice = row.find('.posVoice').val();
+				var id = row.find(".play").html();
+				var bannerFrequency = $('.bannerFrequency').html();
+				var bannerStation = $('.bannerStation').html();
+				var bannerPosition = $('.bannerPosition').html();
+				var dataString = "id="+id+"&&statVoice="+statVoice+"&&freVoice="+freVoice+"&&posVoice="+posVoice+'&&fre='+bannerFrequency+'&&posName='+bannerPosition+'&&statName='+bannerStation;
+				$('.sendscript').html(dataString);
+				$("#player").jPlayer('destroy');
+				$.ajax
+				({
+					type: "POST",
+					url: "sand.php",
+					data: dataString,
+					dataType: 'json',
+					cache: false,
+					
+					success: function(data)
+					{
+						//console.log('generated Audio:'+data.filename);
+						/*var sound = $("<audio style='display:none;position:absolute' id='sound' controls='console' type='audio/mpeg' autoplay='autoplay'/>");
+	            		sound.attr('src', '../files/LO_PRODUCED/'+data.filename+'.ogg');
+	            		///sound.attr('src', '../files/LO_PRODUCED/'+data.filename+'.mp3');
+	            		$(".sendscript").append(sound);
+	            		$(this).html(old); */
+	            		var ogg = '../files/LO_PRODUCED/'+data.filename+'.ogg';
+	            		var mp3 = '../files/LO_PRODUCED/'+data.filename+'.mp3';
+	            		 $("#player").jPlayer({
+				          ready: function () {
+				          	$(this).jPlayer( "clearMedia" );
+				            $(this).jPlayer("setMedia", {
+				              oga: ogg,
+				              mp3: mp3
+				            }).jPlayer('play');
+				          },
+				          supplied: "oga, mp3",
+				          swfPath: "js/",
+				          solution: "flash,html"
+				        });
+	            		$("#console").html(data.script);
+	          			
+
+					} 
+				});
+				
+	});
+	$('.addCart').click(function(){
+			
+			var row = $(this).closest('tr');
+				var statVoice = row.find('.statVoice').val();
+				var freVoice = row.find('.freVoice').val();
+				var posVoice = row.find('.posVoice').val();
+				var id = row.find(".play").html();
+				var bannerFrequency = $('.bannerFrequency').html();
+				var bannerStation = $('.bannerStation').html();
+				var bannerPosition = $('.bannerPosition').html();
+				var dataString = "id="+id+"&&statVoice="+statVoice+"&&freVoice="+freVoice+"&&posVoice="+posVoice+'&&fre='+bannerFrequency+'&&posName='+bannerPosition+'&&statName='+bannerStation;
+				$('.sendscript').html(dataString);
+				//console.log("Going to ajax call");
+				$.ajax
+				({
+					type: "POST",
+					url: "images/cart",
+					data: dataString,
+					cache: false,
+					dataType:'json',
+					success: function(data)
+					{	
+						if(data.check == 0){
+							//$("#console").html(data.count);	
+							//console.log(data.count);
+							$("#mycart").html("My Cart("+data.count+")");
+							
+						}
+						else{
+							//console.log('Cant add')
+							/*var errormsg = $("<div class='alert alert-error'>You have already added this item to your cart<a class='close' data-dismiss='alert' href='#'>×</a></div>");
+							$(".notifications").html(errormsg);*/
+							alert("You have already added this piece");
+						}
+
+					} 
+				});
+				
+	});
+
+});
+
+</script>
+ <div id="player"></div>
+				<div class="span12 custom_well" style="padding:10px 0px;border-radius:10px;color:#d30000;background:white !important;border:3px solid #d30000;">
+					
+					<div class="span2"><p><h4>Format</h4><h2 class="bannerFormat">{{format}}</h2></p></div>
+					<div class="span2"><p><h4>Frequency</h4><h2 class="bannerFrequency">{{frequency}}</h2></p></div>
+					<div class="span2"><p><h4>Station</h4><h2 class="bannerStation">{{station}}</h2></p></div>
+					<div class="span5"><p><h4>Slogan</h4><h2 class="bannerPosition">{{slogan}}</h2></p></div>
+					
+	
+				</div>
+				<div class="span12">&nbsp;</div>
+  				<div class="span12">
+  					
+  					
+ 					
+					<table class="table table-hover">
+					<thead>
+					<tr>
+					
+						<th>Title</th>
+						<th>Price</th>
+						<th>Length</th>
+						<th>Station Talent</th>
+						<th>Frequency Talent</th>
+						<th>Slogan Talent</th>
+						<th>&nbsp; </th>
+						<th><a href="{% url 'home' %}" class="btn btn-info">New Search</a></th>
+						
+					</tr>
+					</thead>
+					<tbody>
+			 {% for template in templates %}	
+						<tr>
+							<td><b>{{template.name}}</b></td><td>{{template.price}}</td><td>{{template.length}}</td>
+							<td><select class="statVoice" name="statVoice">
+							{% for voice in template.station_talents.all %}
+								<option value="{{ voice.name }}">{{ voice.name }} ({{ voice.description }})</option>
+							{% endfor %}
+							</select></td>
+							<td><select class="freVoice" name="freVoice">
+							{% for voice in template.frequency_talents.all %}
+								<option value="{{ voice.name }}">{{ voice.name }} ({{ voice.description }})</option>
+							{% endfor %}
+							</select></td>
+							<td><select class="posVoice" name="posVoice">
+							{% for voice in template.slogan_talents.all %}
+								<option value="{{ voice.name }}">{{ voice.name }} ({{ voice.description }})</option>
+							{% endfor %}
+							</select></td>
+							<td><img class="play-button" src="assets/img/play.png" style="cursor:pointer"><a class="play" style="display:none" href="#">{{template.id}</a></td>
+							<td><input type="button" class="btn btn-small addCart"  style="font-weight:bold;color:#d30000;" value="Add To Cart"></Cart></td>
+							
+						</tr>
+			{% endfor %}
+
+			</tbody></table>
+			</div>
+		</div
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block container %}
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			$(".format").change(function()
+			{
+				
+				var id=$(this).val();
+				var dataString = 'id='+ id +'&type=station';
+				$.ajax
+				({
+					type: "GET",
+					url: "images/lister",
+					data: dataString,
+					cache: false,
+					success: function(html)
+					{
+						$(".station").html(html);
+					} 
+				});
+				var dataString = 'id='+ id +'&type=slogan';
+				$.ajax
+				({
+					type: "GET",
+					url: "images/lister",
+					data: dataString,
+					cache: false,
+					success: function(html)
+					{
+						$(".position").html(html);
+					} 
+				});
+
+			});
+
+		});
+		</script>
+		<!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="hero-unit">
+        <h1 style="text-transform:none;margin-left: 125px;">Radio imaging on demand.<br> <span style="color:#d30000">Q</span>uick. Easy. </h1>
+        
+        <div class="span12">&nbsp</div>
+        	
+        	<div class="span3"><p><br><a class="btn btn-primary btn-danger btn-large pull-right" href="about.php" style="background:#006DCC">Learn more &raquo;</a></p></div>
+        	<div class="span10"><img class="pull-right" style="margin-right: 84px;margin-top: -138px;" src="{{ STATIC_URL  }}/assets/img/img.png"></div>
+       <!-- <p>Find new imaging for your station FAST!!!! Once you find it, you can hear a LOW QUALITY version of the exact piece you'll be buying by clicking on the speaker icon to the right. If you like it, check the box next to it to add it to your PLAYLIST. When you've finished, click the MY PLAYLIST to proceed to the checkout.-->
+        	
+      </div>
+      <div class="span12"><br><br></div>
+	       <div class="row">
+	        <div class="span5 well" >
+	          
+	          <form class="form-horizontal" action="{% url base:find %}" method="get" style="margin-left:-30px;">
+				<div class="control-group">
+				    <label class="control-label" for="format">Format</label>
+				    <div class="controls">
+						<select class="format" name="format">
+							<option value="" selected="selected">--select format--</option>
+							{% for format in formats %}
+								<option value="{{ format.id }}">{{format.real_name}}</option>
+							{% endfor %}
+						</select>
+					</div>
+	  			</div>
+				<div class="control-group">
+				    <label class="control-label" for="frequency">Frequency</label>
+				    <div class="controls">
+						<select name="frequency">
+							{% for frequency in frequencies %}
+								<option style="text-transform:lowercase" value="{{ frequency.id }}">{{frequency.name}}</option>
+							{% endfor %}
+						</select>
+					</div>
+	  			</div>
+	  			<div class="control-group">
+				    <label class="control-label" for="station">Station</label>
+				    <div class="controls">
+							<select name="station" class="station">
+								<option selected="selected">--select format--</option>
+							</select>
+					</div>
+				</div>
+				<div class="control-group">
+				    <label class="control-label" for="postion">slogan</label>
+				    <div class="controls">
+						<select name="slogan" class="position">
+							<option selected="selected">--select format--</option>
+						</select>
+					</div>
+				</div>
+				<div class="control-group">
+				    <div class="controls">
+						<button class="btn btn-danger" type="submit" value="search" name="submit">Find Image</button>
+					</div>
+				</div>
+			</form>
+	     	</div>
+	     	<div class="span5 well pull-right" >
+	     		<h2 style="text-transform:none;color:#d30000">Here's how:</h2>
+	     		<p >
+	     		<ol class="home_hei" >
+	     			<li>Enter Station Details</li>
+	     			<li>Select Voices</li>
+	     			<li>Click <img src="{{ STATIC_URL  }}/assets/img/play.png"> to produce</li>
+	     			<li>Add to Cart</li>
+	     			<li>Checkout & Download</li>
+	     		</ol></p>
+	     		<br>
+	     	</div>
+	    </div>
+	  {% endblock %}
